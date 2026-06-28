@@ -12,10 +12,16 @@ dependencies = [
     "openai>=2.43.0",
     "panda>=0.3.1",
     "pandas>=3.0.3",
+    "python-dotenv>=1.2.2",
 ]
 
 [tool.uv.workspace]
 members = [
     "apps/api",
     "apps/chatbot_ui",
+]
+
+[dependency-groups]
+dev = [
+    "qdrant-client>=1.18.0",
 ]
