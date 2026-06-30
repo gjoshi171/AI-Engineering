@@ -1,2 +1,11 @@
+#Byte-compiled
+__pycache__/
+*.py[cod]
+
+#Environments
 .env
 .venv
+
+#local data
+data/
+qdrant_data
