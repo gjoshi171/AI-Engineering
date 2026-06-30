@@ -23,6 +23,10 @@ members = [
 
 [dependency-groups]
 dev = [
-    "langsmith>=0.9.3",
+    "langchain-community>=0.4.0,<0.4.2",
+    "langchain-google-vertexai>=3.2.4",
+    "langchain-openai>=1.1.9",
+    "langsmith>=0.8.16",
     "qdrant-client>=1.18.0",
+    "ragas>=0.4.3",
 ]
