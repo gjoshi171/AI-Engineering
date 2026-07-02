@@ -7,4 +7,9 @@ clean-notebook-outputs:
 
 run-evals-retriever:
 	uv sync
-	PYTHONPATH=${PWD}/apps/api:${PWD}/apps/api/src:$$PYTHONPATH:${PWD} uv run --env-file .env python -m evals.eval_retriever
+#for bash
+#PYTHONPATH=${PWD}/apps/api:${PWD}/apps/api/src:$$PYTHONPATH:${PWD} uv run --env-file .env python -m evals.eval_retriever
+
+# Windows PowerShell
+	$env:PYTHONPATH="$PWD\apps\api;$PWD\apps\api\src;$PWD"
+	uv run --env-file .env python -m evals.eval_retriever

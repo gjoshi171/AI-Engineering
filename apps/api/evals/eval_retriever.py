@@ -11,6 +11,8 @@ from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas import SingleTurnSample
 from ragas.metrics import IDBasedContextPrecision, IDBasedContextRecall, Faithfulness, ResponseRelevancy
 
+import random
+
 ls_client = Client()
 qdrant_client = QdrantClient(url="http://localhost:6333")
 
@@ -24,8 +26,8 @@ def ragas_context_precision_id_based(run, example):
         retrieved_context_ids=run.outputs["retrieved_context_ids"],
         reference_context_ids=example.outputs["reference_context_ids"]
     )
-    scorer = IDBasedContextPrecision
-    return scorer.single_turn_ascore(sample)
+    scorer = IDBasedContextPrecision()
+    return scorer.single_turn_score(sample)
 
 
 def ragas_context_recall_id_based(run, example):
@@ -35,7 +37,7 @@ def ragas_context_recall_id_based(run, example):
         reference_context_ids=example.outputs["reference_context_ids"]
     )
     scorer = IDBasedContextRecall()
-    return scorer.single_turn_ascore(sample)
+    return scorer.single_turn_score(sample)
 
 
 # No actual reference output (Eval)
@@ -47,7 +49,7 @@ def ragas_faithfulness(run, example):
             retrieved_contexts=run.outputs["retrieved_context"]
         )
     scorer = Faithfulness(llm=ragas_llm)
-    return scorer.single_turn_ascore(sample)
+    return scorer.single_turn_score(sample)
 
 
 def ragas_relevancy(run, example):
@@ -58,13 +60,21 @@ def ragas_relevancy(run, example):
         retrieved_contexts=run.outputs["retrieved_context"]
     )
     scorer = ResponseRelevancy(llm=ragas_llm, embeddings=ragas_embeddings)
-    return scorer.single_turn_ascore(sample)
+    return scorer.single_turn_score(sample)
 
+# Fetch all examples
+examples = list(
+    ls_client.list_examples(
+        dataset_name="rag-evaluation-dataset"
+    )
+)
 
+# Pick 20 random examples
+random_examples = random.sample(examples, 20)
 
 results = ls_client.evaluate(
     lambda x: rag_pipeline(x["question"], qdrant_client),
-    data="rag-evaluation-dataset",
+    data=random_examples,
     evaluators=[
         ragas_context_precision_id_based,
         ragas_context_recall_id_based,
