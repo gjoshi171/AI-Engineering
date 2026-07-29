@@ -2,12 +2,13 @@ from pydantic import BaseModel, Field
 from typing import Annotated, List, Any
 from operator import add
 from api.agents.agents import RAGUsedContext, agent_node, intent_router_node
-from api.agents.tools import get_formatted_item_context
+from api.agents.tools import get_formatted_item_context, get_formatted_reviews_context
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
+from langgraph.checkpoint.postgres import PostgresSaver
 
 
 class State(BaseModel):
@@ -44,8 +45,8 @@ def intent_router_conditional_edges(state: State) -> str:
 
 workflow = StateGraph(State)
 
-tools = [get_formatted_item_context]
-tool_node = ToolNode(tools)
+tools = [get_formatted_item_context, get_formatted_reviews_context]
+tool_node = ToolNode(tools) 
 
 workflow.add_node("tool_node", tool_node)
 workflow.add_node("agent_node", agent_node)
@@ -78,23 +79,25 @@ graph = workflow.compile()
 
 ### Agent Execution
 
-def run_agent(question: str) -> dict:
+
+def agent_wrapper(question: str, thread_id: str) -> dict:
+
+
+    qdrant_client = QdrantClient(url="http://qdrant:6333")
 
     initial_state = {
         "messages": [HumanMessage(content=question)],
         "iteration": 0,
     }
+    config = {
+        "configurable": {
+            "thread_id": thread_id 
+        }
+    }
 
-    result = graph.invoke(initial_state)
-
-    return result
-
-
-def agent_wrapper(question: str) -> dict:
-
-    qdrant_client = QdrantClient(url="http://qdrant:6333")
-
-    result = run_agent(question)
+    with PostgresSaver.from_conn_string("postgresql://langgraph_user:langgraph_password@postgres:5432/langgraph_db") as checkpointer:
+        graph = workflow.compile(checkpointer=checkpointer)
+        result = graph.invoke(initial_state, config)
 
     used_context = []
 
