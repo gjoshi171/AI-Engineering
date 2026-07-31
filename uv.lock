@@ -40,9 +40,11 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "cohere" },
+    { name = "fastmcp" },
     { name = "instructor" },
     { name = "langchain-community" },
     { name = "langchain-google-vertexai" },
+    { name = "langchain-mcp-adapters" },
     { name = "langchain-openai" },
     { name = "langgraph" },
     { name = "langgraph-checkpoint-postgres" },
@@ -66,9 +68,11 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "cohere", specifier = ">=7.0.5" },
+    { name = "fastmcp", specifier = ">=3.4.5" },
     { name = "instructor", specifier = ">=1.15.4" },
     { name = "langchain-community", specifier = ">=0.4.0,<0.4.2" },
     { name = "langchain-google-vertexai", specifier = ">=3.2.4" },
+    { name = "langchain-mcp-adapters", specifier = ">=0.3.1" },
     { name = "langchain-openai", specifier = ">=1.1.9" },
     { name = "langgraph", specifier = ">=1.2.2" },
     { name = "langgraph-checkpoint-postgres", specifier = ">=3.1.0" },
@@ -2343,6 +2347,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/39/1c/4efdcfe094ef6711d9c130428c4c42af61a49a1580fa718dd1e1f6bd5fc3/langchain_google_vertexai-3.2.4.tar.gz", hash = "sha256:f0c16b4b639037f60357dbf6d4aa3b0f301f23be6b33b0688c75902235cb9434", size = 351222, upload-time = "2026-06-09T14:57:58.316Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/04/a2/af563ff45208d22abc28d0a0e44a7fb8aceaadac201afa6a11c77bfb6338/langchain_google_vertexai-3.2.4-py3-none-any.whl", hash = "sha256:65b5615e596fdabc2e149f0160fded88bebef2bbc1ea70095ff81714f7570183", size = 118884, upload-time = "2026-06-09T14:57:57.062Z" },
+]
+
+[[package]]
+name = "langchain-mcp-adapters"
+version = "0.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+    { name = "mcp" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5a/5d/1f43b6a14cf448ea47bceb2860e9a6e3b0a911de0719aba43ed3eb927195/langchain_mcp_adapters-0.3.1.tar.gz", hash = "sha256:e08d4a74a0934d558ddb807ecbb8f89466c93a0d06c1fb58974b93b4703de01c", size = 47140, upload-time = "2026-07-27T18:36:45.792Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/22/8d/934946caf18559158678099ac00e6eed67d78e68c4e73c7afd01e19d31ec/langchain_mcp_adapters-0.3.1-py3-none-any.whl", hash = "sha256:1e354d9466db9fab9e30f24419adffbd39a84229e7f452927f99ea799e1937f9", size = 28877, upload-time = "2026-07-27T18:36:44.762Z" },
 ]
 
 [[package]]
