@@ -9,3 +9,4 @@ __pycache__/
 #local data
 data/
 qdrant_data
+postgres_data/
