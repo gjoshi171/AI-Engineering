@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
-from core.config import config
+from chatbot_ui.core.config import config
 import uuid
 import json
+
 
 st.set_page_config(
     page_title="Ecommerce Assistant",
@@ -49,6 +50,7 @@ def api_call(method, url, **kwargs):
     except Exception as e:
         _show_error_popup(f"An unexpected error occurred: {str(e)}")
         return False, {"message": str(e)}
+
 
 def api_call_stream(method, url, **kwargs):
 
@@ -98,7 +100,7 @@ def submit_feedback(feedback_type=None, feedback_text=""):
 
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "Hello! how can I assist you today?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Hello! How can I assist you today?"}]
 
 if "used_context" not in st.session_state:
     st.session_state.used_context = []
@@ -108,6 +110,7 @@ if "thread_id" not in st.session_state:
 
 if "trace_id" not in st.session_state:
     st.session_state.trace_id = ""
+
 
 # Initialize feedback states (simplified)
 if "latest_feedback" not in st.session_state:
@@ -119,13 +122,17 @@ if "show_feedback_box" not in st.session_state:
 if "feedback_submission_status" not in st.session_state:
     st.session_state.feedback_submission_status = None
 
-#display the chat history
+if "shopping_cart" not in st.session_state:
+    st.session_state.shopping_cart = None
+
 # for message in st.session_state.messages:
 #     with st.chat_message(message["role"]):
 #         st.markdown(message["content"])
 
+
 with st.sidebar:
-    suggestions_tab, = st.tabs(["🔍 Suggestions"])
+
+    suggestions_tab, shopping_cart_tab = st.tabs(["🔍 Suggestions", "🛒 Shopping Cart"])
 
     with suggestions_tab:
         if st.session_state.used_context:
@@ -137,6 +144,21 @@ with st.sidebar:
                 st.divider()
         else:
             st.info("No suggestions yet")
+
+    with shopping_cart_tab:
+        if st.session_state.shopping_cart:
+            
+            for idx, item in enumerate(st.session_state.shopping_cart):
+                st.caption(item.get('description', 'No description'))
+                if 'product_image_url' in item:
+                    st.image(item["product_image_url"], width=250)
+                st.caption(f"Price: {item['price']} {item['currency']}")
+                st.caption(f"Quantity: {item['quantity']}")
+                st.caption(f"Total price: {item['total_price']} {item['currency']}")
+                st.divider()
+        else:
+            st.info("Your cart is empty")
+
 
 for idx, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -214,23 +236,6 @@ for idx, message in enumerate(st.session_state.messages):
                         st.session_state.show_feedback_box = False
                         st.rerun()
 
-# previous
-# if prompt := st.chat_input("Hello! how can I help you today?"):
-#     st.session_state.messages.append({"role": "user", "content": prompt})
-#     with st.chat_message("user"):
-#         st.markdown(prompt)
-
-#     with st.chat_message("assistant"):
-#         state, output = api_call("post", f"{config.API_URL}/agent", json={"query": prompt, "thread_id": st.session_state.thread_id})
-#         answer = output["answer"]
-#         used_context = output["used_context"]
-#         trace_id = output["trace_id"]
-
-#         st.session_state.used_context = used_context
-#         st.session_state.trace_id = trace_id
-#         st.write(answer)
-#     st.session_state.messages.append({"role": "assistant", "content": answer})
-#     st.rerun()
 
 if prompt := st.chat_input("Hello! How can I assist you today?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -260,10 +265,12 @@ if prompt := st.chat_input("Hello! How can I assist you today?"):
                         answer = output["data"]["answer"]
                         used_context = output["data"]["used_context"]
                         trace_id = output["data"]["trace_id"]
+                        shopping_cart = output["data"]["shopping_cart"]
                         
                         st.session_state.used_context = used_context
                         st.session_state.messages.append({"role": "assistant", "content": answer})
                         st.session_state.trace_id = trace_id
+                        st.session_state.shopping_cart = shopping_cart
 
                         st.session_state.latest_feedback = None
                         st.session_state.show_feedback_box = False
