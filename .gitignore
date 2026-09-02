@@ -6,6 +6,9 @@ __pycache__/
 .env
 .venv
 
+#Local Claude Code notes
+CLAUDE.local.md
+
 #local data
 data/
 qdrant_data
